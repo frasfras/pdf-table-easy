@@ -13,7 +13,7 @@ import {
   CircularProgress
 } from '@mui/material';
 
-const API_URL = REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 function cleanRows(rows) {
   return rows
