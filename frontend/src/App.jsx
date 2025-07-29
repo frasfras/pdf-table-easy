@@ -13,7 +13,7 @@ import {
   CircularProgress
 } from '@mui/material';
 
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL;
 
 function cleanRows(rows) {
   return rows
@@ -45,7 +45,7 @@ function App() {
     setTables([]);
 
     try {
-      const res = await fetch(`${API_URL}/extract`, {
+      const res = await fetch(process.env.REACT_APP_API_URL + "/extract", {
         method: 'POST',
         body: formData
       });
