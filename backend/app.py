@@ -2,22 +2,21 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 from werkzeug.utils import secure_filename
-import fitz  # PyMuPDF
+import fitz
 from PIL import Image
 import io
-from paddleocr import PaddleOCR
 
+from paddleocr import PPStructure, save_structure_res
 
 app = Flask(__name__)
 
 # Replace with your actual deployed frontend URL
 CORS(app, resources={r"/*": {"origins": "https://stellular-hotteok.netlify.app/"}})
-
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Use structure=True to enable layout analysis (table detection)
-ocr = PaddleOCR(use_angle_cls=True, lang='en', structure=True, show_log=False)
+# Table extraction model
+ocr = PPStructure(layout=True)  # structure=True is not valid in PaddleOCR
 
 @app.route('/extract', methods=['POST'])
 def extract_tables():
@@ -38,22 +37,19 @@ def extract_tables():
         image_bytes = pix.tobytes("png")
         image = Image.open(io.BytesIO(image_bytes))
 
-        # Run layout analysis
-        result = ocr.ocr(image, det=True, rec=True, structure=True, cls=True)
-
-        rows = []
-        for element in result:
-            if element['type'] == 'table':
-                for row in element['res']:
-                    cell_values = [cell.strip() for cell in row if isinstance(cell, str) and cell.strip()]
-                    if cell_values:
-                        rows.append(cell_values)
-
-        if rows:
-            all_tables.append({
-                'page': page_num + 1,
-                'rows': rows
-            })
+        result = ocr(image)
+        for region in result:
+            if region['type'] == 'table':
+                rows = []
+                for row in region['res']:
+                    cells = [c for c in row if c.strip()]
+                    if cells:
+                        rows.append(cells)
+                if rows:
+                    all_tables.append({
+                        'page': page_num + 1,
+                        'rows': rows
+                    })
 
     return jsonify({'tables': all_tables})
 
