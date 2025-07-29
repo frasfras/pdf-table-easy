@@ -3,11 +3,12 @@ services:
     name: bankeasy-backend
     env: python
     buildCommand: |
-      pip install -i https://pypi.org/simple --upgrade pip
-      pip install https://paddlepaddle.org.cn/whl/paddlepaddle-cpu-2.5.2-cp310-cp310-manylinux_2_17_x86_64.whl
+      pip install --upgrade pip
+      pip install https://paddlepaddle.org.cn/whl/cpu/mkl/paddlepaddle-2.5.2-cp310-cp310-linux_x86_64.whl
       pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PORT
         value: 5000
+
 
