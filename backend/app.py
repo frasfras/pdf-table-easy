@@ -7,8 +7,11 @@ from PIL import Image
 import io
 from paddleocr import PaddleOCR
 
+
 app = Flask(__name__)
-CORS(app)
+
+# Replace with your actual deployed frontend URL
+CORS(app, resources={r"/*": {"origins": "https://stellular-hotteok.netlify.app/"}})
 
 UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
